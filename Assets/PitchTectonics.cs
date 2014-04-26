@@ -16,6 +16,8 @@ public class PitchTectonics : MonoBehaviour {
 	Mesh pitchSurface;
 
 	public bool testing = false;
+	public bool debugging = false;
+	public float tectonicPower = 5.0f;
 
 	private float uPerPixel = 0.0f;
 	private float vPerPixel = 0.0f;
@@ -133,7 +135,7 @@ public class PitchTectonics : MonoBehaviour {
 		for (int i = 0; i <  totalPixels; ++i) { colors[i].g = colors[i].r = colors[i].b = 0.0f;  colors[i].a = 1.0f; }
 		tectonicInputMap.SetPixels (0, 0, 1024, 512, colors);
 		tectonicInputMap.Apply ();
-		if(testing)
+		if(testing && debugging)
 			renderer.material.mainTexture = tectonicInputMap;
 		uPerPixel = 1.0f / tectonicInputMap.width;
 		vPerPixel = 1.0f / tectonicInputMap.height;
@@ -192,13 +194,16 @@ public class PitchTectonics : MonoBehaviour {
 
 	void SetPitchHeight()
 	{
-		// Vector3[] verts = 
+		Vector3[] verts = pitchSurface.vertices;
+		Vector2[] uvs = pitchSurface.uv;
 
 		int totalVerts = widthVerts * lengthVerts;
 		for(int i = 0; i < totalVerts; ++i)
 		{
-			// set the heights buy textures 
+			verts[i].y = tectonicPower * tectonicInputMap.GetPixelBilinear(uvs[i].x, uvs[i].y).r * tectonicPowerMap.GetPixelBilinear(uvs[i].x, uvs[i].y).r;
 		}
+
+		pitchSurface.vertices = verts;
 	}
 
 	void SettleTectonics()
@@ -227,6 +232,8 @@ public class PitchTectonics : MonoBehaviour {
 				AddTectonics (coords);
 			}
 		}
+
+		SetPitchHeight ();
 
 		SettleTectonics ();
 	}
