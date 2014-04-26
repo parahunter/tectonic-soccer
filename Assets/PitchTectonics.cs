@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PitchTectonics : MonoBehaviour {
 
@@ -43,6 +44,9 @@ public class PitchTectonics : MonoBehaviour {
 	private Color[] inputColor;
 	private Color[] decalColor;
 	
+	Vector3[] verts;
+	Vector2[] uv;
+	
 	private void InitialiseVerts()
 	{
 		float incrementL = length / (lengthVerts - 1);
@@ -52,9 +56,9 @@ public class PitchTectonics : MonoBehaviour {
 		float halfLength = length * 0.5f;
 		float halfWidth = halfLength * aspectRatio;
 		
-		Vector3[] verts = new Vector3[widthVerts * lengthVerts];
+		verts = new Vector3[widthVerts * lengthVerts];
 		Vector3[] normals = new Vector3[widthVerts * lengthVerts];
-		Vector2[] uv = new Vector2[widthVerts * lengthVerts];
+		uv = new Vector2[widthVerts * lengthVerts];
 		
 		int index = 0;
 		for (int l = 0; l < lengthVerts; ++l) {
@@ -66,8 +70,13 @@ public class PitchTectonics : MonoBehaviour {
 					Debug.Log(w);
 				}
 				verts[index].x = ((l * incrementL) - halfLength);
-				verts[index].y = 0.0f; verts[index].z = ((w * incrementW) - halfWidth);
-				normals[index].x = 0.0f; normals[index].y = 1.0f; normals[index].x = 0.0f;
+				//verts[index].y = 0.0f; 
+				verts[index].z = ((w * incrementW) - halfWidth);
+				
+				//normals[index].x = 0.0f; 
+				normals[index].y = 1.0f; 
+				//normals[index].x = 0.0f;
+				
 				uv[index].x = (l * incrementU); uv[index].y = (w * incrementV);
 			}
 		}
@@ -76,25 +85,27 @@ public class PitchTectonics : MonoBehaviour {
 		pitchSurface.uv = uv;
 		
 		int[] indices = new int[(widthVerts - 1) * (lengthVerts - 1) * 6];
-		IList indicesList = new ArrayList ();
+		
+
+		int i = 0;
 		int index1, index2, index3;
 		for (int x = 0; x < lengthVerts -1; ++x) {
 			for (int y = 0; y < widthVerts -1; ++y) {
 				index1 = ((y * lengthVerts) + x);
 				index2 = index1 + lengthVerts;
 				index3 = index2 + 1;
-				indicesList.Add(index1);
-				indicesList.Add(index2);
-				indicesList.Add(index3);
-				indicesList.Add(index1);
-				indicesList.Add(index3);
-				indicesList.Add(index1 + 1);
+				indices[i + 0] = index1;
+				indices[i + 1] = index2;
+				indices[i + 2] = index3;
+				indices[i + 3] = index1;
+				indices[i + 4] = index3;
+				indices[i + 5] = index1 + 1;
+				
+				i += 6;
 			}
 		}
+		
 		Debug.Log (indices.Length);
-		Debug.Log (indicesList.Count);
-		for (int i = 0; i < indices.Length; ++i)
-			indices [i] = (int)indicesList [i];
 		
 		pitchSurface.triangles = indices;
 	}
@@ -129,11 +140,12 @@ public class PitchTectonics : MonoBehaviour {
 		MeshFilter meshFilter = this.GetComponent ("MeshFilter") as MeshFilter;
 		meshFilter.sharedMesh = pitchSurface;
 
-		tectonicInputMap = new Texture2D (1024, 512, TextureFormat.ARGB32, false, false);
-		int totalPixels = 1024 * 512;
+		tectonicInputMap = new Texture2D ( lengthVerts, widthVerts , TextureFormat.ARGB32, false, false);
+		
+		int totalPixels = lengthVerts * widthVerts;
 		Color[] colors = new Color[totalPixels];
 		for (int i = 0; i <  totalPixels; ++i) { colors[i].g = colors[i].r = colors[i].b = 0.0f;  colors[i].a = 1.0f; }
-		tectonicInputMap.SetPixels (0, 0, 1024, 512, colors);
+		tectonicInputMap.SetPixels (0, 0, lengthVerts, widthVerts, colors);
 		tectonicInputMap.Apply ();
 		if(testing && debugging)
 			renderer.material.mainTexture = tectonicInputMap;
@@ -194,30 +206,42 @@ public class PitchTectonics : MonoBehaviour {
 
 	void SetPitchHeight()
 	{
-		Vector3[] verts = pitchSurface.vertices;
-		Vector2[] uvs = pitchSurface.uv;
 
 		int totalVerts = widthVerts * lengthVerts;
+		int l = lengthVerts - 1;
+		int w = widthVerts - 1;
+		
+		Color[] pixels = tectonicInputMap.GetPixels();
 		for(int i = 0; i < totalVerts; ++i)
 		{
-			verts[i].y = tectonicPower * tectonicInputMap.GetPixelBilinear(uvs[i].x, uvs[i].y).r * tectonicPowerMap.GetPixelBilinear(uvs[i].x, uvs[i].y).r;
+			Vector2 uvssss = uv[i];
+			int x = (int) (  uvssss.x * l) ;
+			int y = (int) ( uvssss.y * w ) ; 
+			verts[i].y = tectonicPower * pixels[x + y * lengthVerts].r ;// * tectonicPowerMap.GetPixelBilinear(uv[i].x, uv[i].y).r;
 		}
 
 		pitchSurface.vertices = verts;
 	}
 
+	public float dampening = 80f;
 	void SettleTectonics()
 	{ 
-		for (int i = 0; i < tectonicInputMap.width; ++i) {
-			for (int j = 0; j < tectonicInputMap.height; ++j) {
-				Color texel = tectonicInputMap.GetPixel (i, j);
-				if (texel.b > 0.0f)
+		Color[] pixels = tectonicInputMap.GetPixels();
+	
+		float actualDamping = dampening * Time.deltaTime;
+		
+		for (int i = 0; i < tectonicInputMap.width; ++i) 
+		{
+			for (int j = 0; j < tectonicInputMap.height; ++j) 
+			{
+				//if (texel.b > 0.0f)
 				{
-					texel *= 0.8f;
-					tectonicInputMap.SetPixel(i, j, texel);
+					pixels[i + j * tectonicInputMap.width].r -= actualDamping;
 				}
 			}
 		}
+		
+		tectonicInputMap.SetPixels(pixels);
 		tectonicInputMap.Apply ();
 	}
 	
@@ -233,8 +257,13 @@ public class PitchTectonics : MonoBehaviour {
 			}
 		}
 
+		Profiler.BeginSample( "set pitch height");
 		SetPitchHeight ();
+		Profiler.EndSample();
 
+		Profiler.BeginSample("settle");
 		SettleTectonics ();
+		Profiler.EndSample();
+		
 	}
 }
