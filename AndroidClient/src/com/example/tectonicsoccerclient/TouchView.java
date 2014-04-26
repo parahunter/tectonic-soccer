@@ -37,6 +37,20 @@ public class TouchView extends View
 			touches[i] = new Touch(x,y);   
 		}
 	    
+		int action = e.getActionMasked();
+		
+		if(action == MotionEvent.ACTION_DOWN)
+			udpSender.NewTouch(0);
+		
+		if(action == MotionEvent.ACTION_POINTER_DOWN)	
+			udpSender.NewTouch( e.getActionIndex() );
+		
+		if(action == MotionEvent.ACTION_UP && e.getPointerCount() == 1)
+		{
+			udpSender.setTouches(null);
+			return true;
+		}
+		
 	    Log.v("touch", touches[0].x + "");
 		
 	    udpSender.setTouches(touches);

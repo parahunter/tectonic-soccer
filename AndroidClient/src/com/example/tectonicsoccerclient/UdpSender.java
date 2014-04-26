@@ -20,7 +20,14 @@ public class UdpSender implements Runnable {
 	
 	private Touch[] touches;
 	
-	private int milisecondsPerPackage = 1000/25;
+	private int milisecondsPerPackage = 1000/60;
+	
+	private boolean[] newTouches = new boolean[4];
+	
+	public synchronized void NewTouch(int index)
+	{
+		this.newTouches[index] = true;
+	}
 	
 	public synchronized void setTouches(Touch[] touches)
 	{
@@ -31,13 +38,16 @@ public class UdpSender implements Runnable {
 	{
 		serverPort = port;
 		serverAddress = address;
+		
+		for(int i = 0 ; i < newTouches.length ; i++)
+			newTouches[i] = false;
 	}
 	
 	public void run() 
 	{
 		//Log.v("progress", "start of thread");
-		try {
-			
+		try 
+		{
 			// Create UDP socket
 			DatagramSocket socket = new DatagramSocket();
 			//OutputStream stream = new OutputStream();
@@ -54,7 +64,14 @@ public class UdpSender implements Runnable {
 					{
 						dataStream.writeFloat(touches[i].x );
 						dataStream.writeFloat(touches[i].y );
-											
+						
+						if(newTouches[i])
+						{
+							dataStream.writeByte( 1);
+							newTouches[i] = false;
+						}
+						else
+							dataStream.writeByte(0);
 					}
 					
 					dataStream.flush();
@@ -70,7 +87,18 @@ public class UdpSender implements Runnable {
 					// Send of the packet
 					socket.send(packet);
 				}
+				else
+				{
+					byte[] bytes = new byte[1];
 				
+					// Create the UDP packet with destination
+					DatagramPacket packet = new DatagramPacket(bytes,bytes.length, serverAddress,serverPort);
+				
+					//Log.v("packet message", "trying to send packet");
+					// Send of the packet
+					socket.send(packet);
+				}
+					
 				//suspend the thread for x miliseconds
 				Thread.sleep(milisecondsPerPackage);
 			}

@@ -20,7 +20,21 @@ public class UdpTouchReceiver : MonoBehaviour
 
 	private IPEndPoint udpRemoteIpEndPoint;
 	
-	public Vector2[] touches;
+	public class TouchData
+	{
+		public Vector2 position;
+		public bool newTouch;
+	}
+	
+	TouchData[] touches;
+	
+	public TouchData[] GetTouches()
+	{
+//		lock(touches)
+		{
+			return touches;
+		}
+	}
 	
 	void Start()
 	{
@@ -35,9 +49,10 @@ public class UdpTouchReceiver : MonoBehaviour
 	{
 		if(touches != null)
 		{
-			foreach(Vector2 touch in touches)
+			foreach(TouchData touch in GetTouches())
 			{
-				Vector3 center = new Vector3(touch.x, 0, touch.y) * 10;
+				Vector2 pos = touch.position;
+				Vector3 center = new Vector3(pos.x, 0, pos.y) * 10;
 				Gizmos.DrawWireSphere(center, 1f);
 			}
 		}
@@ -52,6 +67,7 @@ public class UdpTouchReceiver : MonoBehaviour
 		client.BeginReceive(new AsyncCallback(OnReceive), state);
 	}
 	
+	const int packetLength = 9;
 	void OnReceive(IAsyncResult result)
 	{
 		UdpState state = (UdpState) result.AsyncState;
@@ -59,19 +75,29 @@ public class UdpTouchReceiver : MonoBehaviour
 		IPEndPoint e = state.endPoint;
 		
 		Byte[] data = c.EndReceive( result, ref e);
-				
-		touches = new Vector2[ data.Length / ( 4 * 2)];
 		
-		for(int i = 0 ; i < touches.Length ; i++)
+		TouchData[] newTouchData = new TouchData[ data.Length / packetLength];
+			
+		for(int i = 0 ; i < newTouchData.Length ; i++)
 		{
-			float x = EndianBitConverter.Big.ToSingle( data, (i*2) * 4);
-			float y = EndianBitConverter.Big.ToSingle( data, (i*2) * 4 + 4);
+			float x = EndianBitConverter.Big.ToSingle( data, i * packetLength);
+			float y = EndianBitConverter.Big.ToSingle( data, i * packetLength + 4);
 			
-			Vector2 touch = new Vector2(x, y);
+			TouchData touchData = new TouchData();
+			touchData.position = new Vector2(x, y);
+			touchData.newTouch = data[i * packetLength + 8] == 1 ? true : false;
 			
-			touches[i] = touch;
+			if(touchData.newTouch)
+				print ("hurrai " + i);
+			
+			newTouchData[i] = touchData;
 		}
-				
+		
+	//	lock(touches)
+		{
+			touches = newTouchData;
+		}
+						
 		BeginRecieve();				
 	}
 }
