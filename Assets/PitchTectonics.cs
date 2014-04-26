@@ -123,6 +123,7 @@ public class PitchTectonics : MonoBehaviour {
 	void Start () 
 	{
 		pitchSurface = new Mesh ();
+		pitchSurface.MarkDynamic ();
 		InitialisePitch ();
 		
 		MeshCollider meshCollider = this.GetComponent ("MeshCollider") as MeshCollider;
@@ -212,6 +213,11 @@ public class PitchTectonics : MonoBehaviour {
 		}
 
 		pitchSurface.vertices = verts;
+
+		
+		MeshCollider meshCollider = this.GetComponent ("MeshCollider") as MeshCollider;
+		meshCollider.sharedMesh = null;
+		meshCollider.sharedMesh = pitchSurface;
 	}
 
 	public float dampening = 80f;
