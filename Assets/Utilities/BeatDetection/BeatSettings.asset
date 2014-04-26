@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce91a9239bb60254f8e989a67fee3311, type: 3}
+  m_Name: BeatSettings
+  m_EditorClassIdentifier: 
+  spectogramGradient:
+    key0:
+      serializedVersion: 2
+      rgba: 4281874488
+    key1:
+      serializedVersion: 2
+      rgba: 4281743932
+    key2:
+      serializedVersion: 2
+      rgba: 3356216
+    key3:
+      serializedVersion: 2
+      rgba: 106998
+    key4:
+      serializedVersion: 2
+      rgba: 36606
+    key5:
+      serializedVersion: 2
+      rgba: 36606
+    key6:
+      serializedVersion: 2
+      rgba: 0
+    key7:
+      serializedVersion: 2
+      rgba: 0
+    ctime0: 0
+    ctime1: 1349
+    ctime2: 15227
+    ctime3: 50308
+    ctime4: 65535
+    ctime5: 65535
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_NumColorKeys: 5
+    m_NumAlphaKeys: 2
+  bandColors:
+  - {r: 1, g: .551470578, b: .551470578, a: 1}
+  - {r: .441176474, g: 1, b: .537525356, a: 1}
+  - {r: .575259387, g: .47458908, b: .977941155, a: 1}
+  - {r: .963235319, g: .757497609, b: .389543712, a: 1}
+  - {r: .536764741, g: .980831563, b: 1, a: 1}
+  - {r: 1, g: .986206889, b: .5, a: 1}
+  - {r: 1, g: .632352948, b: .944218993, a: 1}
+  - {r: .370206416, g: .558823526, b: .345155716, a: 1}
+  - {r: .830425739, g: .441176474, b: 1, a: 1}

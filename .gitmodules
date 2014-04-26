@@ -1,0 +1,5 @@
+[submodule "Assets/Submodules/Utilities"]
+	path = Assets/Submodules/Utilities
+	url = git@github.com:parahunter/unity-utilities.git
+	branch = master
+	update = merge
