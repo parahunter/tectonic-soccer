@@ -80,27 +80,30 @@ public class GameController : MonoBehaviour
 
 	void Update()
 	{
-		if (gameState == GameState.goalScord)
-		{
+		if (gameState == GameState.goalScord) {
 			goalTimer += Time.deltaTime;
 
-			if(goalTimer > resetPause && !reseting)
-			{
-				reseting = true;
-				
-				if(onReset != null)
-					onReset();
+			if (goalTimer > resetPause && !reseting) {
+					reseting = true;
+
+					if (onReset != null)
+							onReset ();
 			}
 
-			if(goalTimer > goalPause)
-			{
-				gameState = GameState.inPlay;
-				goalTimer = 0.0f;
-				reseting = false;
-				
-				if(onKickOff != null)
-					onKickOff();
+			if (goalTimer > goalPause) {
+					gameState = GameState.inPlay;
+					goalTimer = 0.0f;
+					reseting = false;
+
+					if (onKickOff != null)
+							onKickOff ();
 			}
+		} 
+		else if (gameState == GameState.finished)
+		{
+			onReset();
+			onFinished();
+			onKickOff();
 		}
 	}
 }
