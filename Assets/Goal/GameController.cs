@@ -46,12 +46,17 @@ public class GameController : MonoBehaviour
 	{
 		if (kickOffDelay < 0.25f) { kickOffDelay = 0.25f; }
 		goalPause = resetPause + kickOffDelay;
+		gameState = GameState.inPlay;
 	}
 	
 	public void OnGoal(int playerGoal)
 	{
-		if (gameState == GameState.inPlay) {
+		if (gameState == GameState.inPlay) 
+		{
 			++playerGoals [playerGoal];
+			
+			lastScorer = playerGoal;
+			
 			if (playerGoals [0] > playerGoals [1])
 				winningPlayer = 0;
 			else if (playerGoals [0] < playerGoals [1])
@@ -61,7 +66,10 @@ public class GameController : MonoBehaviour
 
 			gameState = GameState.goalScord;
 			goalTimer = 0.0f;
-			onScored ();
+
+
+			if(onScored != null)
+				onScored ();
 
 			if(playerGoals [playerGoal] > 9)
 			{
@@ -79,14 +87,19 @@ public class GameController : MonoBehaviour
 			if(goalTimer > resetPause && !reseting)
 			{
 				reseting = true;
-				onReset();
+				
+				if(onReset != null)
+					onReset();
 			}
 
 			if(goalTimer > goalPause)
 			{
+				gameState = GameState.inPlay;
 				goalTimer = 0.0f;
 				reseting = false;
-				onKickOff();
+				
+				if(onKickOff != null)
+					onKickOff();
 			}
 		}
 	}

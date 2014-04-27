@@ -12,9 +12,10 @@ public class ScoreCounter : MonoBehaviour {
 			renderer.material.mainTexture = ((ScoreBoardScript)(transform.parent.gameObject.GetComponent ("ScoreBoardScript"))).goalTextures[GameController.instance.playerGoals[team]];
 		}
 	}
-
+	
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		GameController.instance.onScored += onGoal;
 	}
 	
