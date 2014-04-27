@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour
 	{
 		inPlay = 0,
 		goalScord = 1,
+		finished = 2,
 	}
 	
 	private GameState gameState = GameState.inPlay;
@@ -28,6 +29,7 @@ public class GameController : MonoBehaviour
 	private float goalPause = 0.0f;
 
 	public event System.Action onKickOff;
+	public event System.Action onFinished;
 		
 	public static GameController instance
 	{
@@ -60,6 +62,11 @@ public class GameController : MonoBehaviour
 			gameState = GameState.goalScord;
 			goalTimer = 0.0f;
 			onScored ();
+
+			if(playerGoals [playerGoal] > 9)
+			{
+				gameState = GameState.finished;
+			}
 		}
 	}
 

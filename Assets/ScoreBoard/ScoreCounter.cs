@@ -9,7 +9,7 @@ public class ScoreCounter : MonoBehaviour {
 	{
 		if(GameController.instance.lastScorer == team)
 		{
-			renderer.material.mainTexture = null;
+			renderer.material.mainTexture = ((ScoreBoardScript)(transform.parent.gameObject.GetComponent ("ScoreBoardScript"))).goalTextures[GameController.instance.playerGoals[team]];
 		}
 	}
 
