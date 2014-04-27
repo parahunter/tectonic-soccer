@@ -102,6 +102,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerGoals: 
+  lastScorer: -1
+  winningPlayer: -1
 --- !u!4 &75373637
 Transform:
   m_ObjectHideFlags: 0
@@ -164,10 +166,16 @@ MonoBehaviour:
   levelOfDetail: 1
   length: 20
   aspectRatio: .649999976
+  widthVerts: 3
   lengthVerts: 128
+  pitchSurface: {fileID: 0}
   testing: 1
   debugging: 0
+  brushPower: .300000012
   tectonicPower: 2
+  verts: []
+  normals: []
+  uv: []
   dampening: .5
 --- !u!23 &127972564
 Renderer:
