@@ -1,6 +1,7 @@
 package com.example.tectonicsoccerclient;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
 
@@ -17,8 +18,10 @@ public class TouchView extends View
 		super(context);
 		this.udpSender = udpSender;
 		
-		screenWidth = (float) context.getResources().getConfiguration().screenWidthDp;
-		screenHeight = (float) context.getResources().getConfiguration().screenHeightDp;
+		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+		
+		screenWidth = metrics.widthPixels;
+		screenHeight = metrics.heightPixels;
 	}
 	
 	@Override
@@ -31,10 +34,11 @@ public class TouchView extends View
 		
 		for(int i = 0 ; i < e.getPointerCount() ; i++)
 		{
-			float x = e.getX(i) / screenHeight;
-			float y = e.getY(i) / screenWidth;
+			float x = e.getX(i) / screenWidth;
+			float y = e.getY(i) / screenHeight;
 			
-			touches[i] = new Touch(x,y);   
+			//switched to match with pitch
+			touches[i] = new Touch(y, x);   
 		}
 	    
 		int action = e.getActionMasked();

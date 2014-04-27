@@ -27,7 +27,9 @@ public class UdpTouchReceiver : MonoBehaviour
 	}
 	
 	TouchData[] touches;
-	
+
+	public PitchTectonics pitch;
+		
 	public TouchData[] GetTouches()
 	{
 //		lock(touches)
@@ -54,6 +56,21 @@ public class UdpTouchReceiver : MonoBehaviour
 				Vector2 pos = touch.position;
 				Vector3 center = new Vector3(pos.x, 0, pos.y) * 10;
 				Gizmos.DrawWireSphere(center, 1f);
+			}
+		}
+	}
+	
+	void Update()
+	{
+		if(touches != null)
+		{
+			foreach(TouchData touch in GetTouches())
+			{
+				if(touch.newTouch == true)
+				{
+					pitch.AddTectonics( touch.position );
+					print (touch.position);	
+				}
 			}
 		}
 	}
@@ -88,15 +105,15 @@ public class UdpTouchReceiver : MonoBehaviour
 			touchData.newTouch = data[i * packetLength + 8] == 1 ? true : false;
 			
 			if(touchData.newTouch)
-				print ("hurrai " + i);
+			{
+			//	pitch.AddTectonics( touchData.position );
+				print ("boom");
+			}
 			
 			newTouchData[i] = touchData;
 		}
 		
-	//	lock(touches)
-		{
-			touches = newTouchData;
-		}
+		touches = newTouchData;
 						
 		BeginRecieve();				
 	}

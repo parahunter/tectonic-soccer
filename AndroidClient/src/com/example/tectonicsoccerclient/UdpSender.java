@@ -20,7 +20,7 @@ public class UdpSender implements Runnable {
 	
 	private Touch[] touches;
 	
-	private int milisecondsPerPackage = 1000/60;
+	private int milisecondsPerPackage = 1000/30;
 	
 	private boolean[] newTouches = new boolean[4];
 	
@@ -45,77 +45,78 @@ public class UdpSender implements Runnable {
 	
 	public void run() 
 	{
-		//Log.v("progress", "start of thread");
-		try 
-		{
-			// Create UDP socket
-			DatagramSocket socket = new DatagramSocket();
-			//OutputStream stream = new OutputStream();
-			ByteArrayOutputStream stream = new ByteArrayOutputStream(0);
-			DataOutputStream dataStream = new DataOutputStream(stream);
-			
+		DatagramSocket socket;
+		try {
+			socket = new DatagramSocket();
+		
 			while(runThread == true) 
 			{
-				if(touches != null)
-				{
-					stream.reset();
-					
-					for(int i = 0 ; i < touches.length ; i++)
+			
+			//Log.v("progress", "start of thread");
+			try 
+			{
+				// Create UDP socket
+	
+				//OutputStream stream = new OutputStream();
+				ByteArrayOutputStream stream = new ByteArrayOutputStream(0);
+				DataOutputStream dataStream = new DataOutputStream(stream);
+				
+					if(touches != null)
 					{
-						dataStream.writeFloat(touches[i].x );
-						dataStream.writeFloat(touches[i].y );
+						stream.reset();
 						
-						if(newTouches[i])
+						for(int i = 0 ; i < touches.length ; i++)
 						{
-							dataStream.writeByte( 1);
-							newTouches[i] = false;
+							dataStream.writeFloat(touches[i].x );
+							dataStream.writeFloat(touches[i].y );
+							
+							if(newTouches[i])
+							{
+								dataStream.writeByte( 1);
+								newTouches[i] = false;
+							}
+							else
+								dataStream.writeByte(0);
 						}
-						else
-							dataStream.writeByte(0);
+						
+						dataStream.flush();
+						
+						byte[] bytes = stream.toByteArray();
+						
+						//Log.v("UDP", "x " + tempAccData[0] + " y " + tempAccData[1] + " z " + tempAccData[2]);
+						
+						// Create the UDP packet with destination
+						DatagramPacket packet = new DatagramPacket(bytes,bytes.length, serverAddress,serverPort);
+					
+						//Log.v("packet message", "trying to send packet");
+						// Send of the packet
+						socket.send(packet);
 					}
+					else
+					{
+						byte[] bytes = new byte[1];
 					
-					dataStream.flush();
+						// Create the UDP packet with destination
+						DatagramPacket packet = new DatagramPacket(bytes,bytes.length, serverAddress,serverPort);
 					
-					byte[] bytes = stream.toByteArray();
-					
-					//Log.v("UDP", "x " + tempAccData[0] + " y " + tempAccData[1] + " z " + tempAccData[2]);
-					
-					// Create the UDP packet with destination
-					DatagramPacket packet = new DatagramPacket(bytes,bytes.length, serverAddress,serverPort);
-				
-					//Log.v("packet message", "trying to send packet");
-					// Send of the packet
-					socket.send(packet);
+						//Log.v("packet message", "trying to send packet");
+						// Send of the packet
+						socket.send(packet);
+					}
+						
+					//suspend the thread for x miliseconds
+					Thread.sleep(milisecondsPerPackage);
 				}
-				else
-				{
-					byte[] bytes = new byte[1];
+			catch (Exception e) 
+			{
 				
-					// Create the UDP packet with destination
-					DatagramPacket packet = new DatagramPacket(bytes,bytes.length, serverAddress,serverPort);
-				
-					//Log.v("packet message", "trying to send packet");
-					// Send of the packet
-					socket.send(packet);
-				}
-					
-				//suspend the thread for x miliseconds
-				Thread.sleep(milisecondsPerPackage);
+				e.printStackTrace();
 			}
-			
+		
 		}
-		catch(SocketException e)
-		{
-			Log.e("udp error", e.toString());
-		}
-		catch (Exception e) 
-		{
-			Log.e("udp error", e.getMessage());
-			StackTraceElement[] stackTrace= e.getStackTrace();
-			for(StackTraceElement element : stackTrace )
-				Log.e("udp error trace", element.toString());
-			
-			e.printStackTrace();
+		} catch (SocketException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 }
