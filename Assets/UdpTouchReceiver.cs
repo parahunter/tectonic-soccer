@@ -74,6 +74,7 @@ public class UdpTouchReceiver : MonoBehaviour
 	}
 	
 	bool recieving = false;
+	bool reading = false;
 	
 	void Update()
 	{
@@ -82,19 +83,21 @@ public class UdpTouchReceiver : MonoBehaviour
 		
 		if(recieving)
 			return;
-			
-		{
+	
+		//	reading = true;
 			foreach(TouchData touch in touches)
 			{
 				if(touch.newTouch == true)
 				{
 					pitch.AddTectonics( touch.position );
 					print (touch.position);
-					
+								
 					touch.newTouch = false;	
 				}
 			}
-		}
+			
+		//	reading = false;
+		
 	}
 		
  	void BeginRecieve()
@@ -109,11 +112,15 @@ public class UdpTouchReceiver : MonoBehaviour
 		}
 	}
 	
+	TouchData[] newTouchData;
+	
 	const int packetLength = 9;
 	void OnReceive(IAsyncResult result)
 	{
-		recieving = true;
-		
+		print ("start");
+	
+		bool newTouchRecieved = false;
+	
 	//	lock(client)
 		{
 			UdpState state = (UdpState) result.AsyncState;
@@ -122,7 +129,7 @@ public class UdpTouchReceiver : MonoBehaviour
 		
 			Byte[] data = c.EndReceive( result, ref e);
 		
-			TouchData[] newTouchData = new TouchData[ data.Length / packetLength];
+			newTouchData = new TouchData[ data.Length / packetLength];
 				
 			for(int i = 0 ; i < newTouchData.Length ; i++)
 			{
@@ -136,20 +143,24 @@ public class UdpTouchReceiver : MonoBehaviour
 				if(touchData.newTouch)
 				{ 
 				//	pitch.AddTectonics( touchData.position );
-					print ("boom");
+					newTouchRecieved = true;
 				}
 				
 				newTouchData[i] = touchData;
 			}
 			
-//			lock(touches)
+			recieving = true;
+			
+			if(newTouchRecieved)
 			{
 				touches = newTouchData;
 			}
-									
-			BeginRecieve();	
-			
+
 			recieving = false;
+			
+			print ("end");		    																					
+		    																							    																							    																					
+			BeginRecieve();	
 		}			
 	}
 	
