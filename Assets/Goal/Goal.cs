@@ -10,10 +10,7 @@ public class Goal : MonoBehaviour
 	{
 		if(other.CompareTag( "Ball" ) )
 		{
-			
-			
-			
+			GameController.instance.OnGoal(playerId);
 		}
 	}
-
 }
