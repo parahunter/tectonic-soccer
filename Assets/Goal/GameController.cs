@@ -20,6 +20,7 @@ public class GameController : MonoBehaviour
 
 	public event System.Action onScored;
 	private float goalTimer = 0.0f;
+	private float restartTimer = 0.0f;
 
 	public event System.Action onReset;
 	private bool reseting = false;
@@ -27,6 +28,7 @@ public class GameController : MonoBehaviour
 	public float kickOffDelay = 2.0f;
 
 	private float goalPause = 0.0f;
+	public float gameRestartPause = 2.0f;
 
 	public event System.Action onKickOff;
 	public event System.Action onFinished;
@@ -70,23 +72,36 @@ public class GameController : MonoBehaviour
 		}
 	}
 
+	bool restarting = false;
 	void Update()
 	{
-		if (gameState == GameState.goalScord)
-		{
+		if (gameState == GameState.goalScord) {
 			goalTimer += Time.deltaTime;
 
-			if(goalTimer > resetPause && !reseting)
-			{
-				reseting = true;
-				onReset();
+			if (goalTimer > resetPause && !reseting) {
+					reseting = true;
+					onReset ();
 			}
 
-			if(goalTimer > goalPause)
+			if (goalTimer > goalPause) {
+					goalTimer = 0.0f;
+					reseting = false;
+					onKickOff ();
+			}
+		} else if (gameState == GameState.finished) {
+			restartTimer += Time.deltaTime;
+
+
+			if(restartTimer > gameRestartPause && !restarting)
 			{
-				goalTimer = 0.0f;
-				reseting = false;
-				onKickOff();
+				onReset ();
+				onFinished();
+			}
+			
+			if(restarting && restartTimer > (gameRestartPause * 2.0f))
+			{
+				restarting = false;
+				gameState = GameState.inPlay;
 			}
 		}
 	}
