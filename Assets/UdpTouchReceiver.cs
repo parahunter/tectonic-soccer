@@ -74,7 +74,7 @@ public class UdpTouchReceiver : MonoBehaviour
 			}
 		}
 	}
-	
+		
  	void BeginRecieve()
 	{
 		UdpState state = new UdpState();
@@ -97,7 +97,7 @@ public class UdpTouchReceiver : MonoBehaviour
 			
 		for(int i = 0 ; i < newTouchData.Length ; i++)
 		{
-			float x = EndianBitConverter.Big.ToSingle( data, i * packetLength);
+			float x = 1 - EndianBitConverter.Big.ToSingle( data, i * packetLength);
 			float y = EndianBitConverter.Big.ToSingle( data, i * packetLength + 4);
 			
 			TouchData touchData = new TouchData();
