@@ -20,7 +20,6 @@ public class GameController : MonoBehaviour
 
 	public event System.Action onScored;
 	private float goalTimer = 0.0f;
-	private float restartTimer = 0.0f;
 
 	public event System.Action onReset;
 	private bool reseting = false;
@@ -28,7 +27,6 @@ public class GameController : MonoBehaviour
 	public float kickOffDelay = 2.0f;
 
 	private float goalPause = 0.0f;
-	public float gameRestartPause = 2.0f;
 
 	public event System.Action onKickOff;
 	public event System.Action onFinished;
@@ -48,12 +46,17 @@ public class GameController : MonoBehaviour
 	{
 		if (kickOffDelay < 0.25f) { kickOffDelay = 0.25f; }
 		goalPause = resetPause + kickOffDelay;
+		gameState = GameState.inPlay;
 	}
 	
 	public void OnGoal(int playerGoal)
 	{
-		if (gameState == GameState.inPlay) {
+		if (gameState == GameState.inPlay) 
+		{
 			++playerGoals [playerGoal];
+			
+			lastScorer = playerGoal;
+			
 			if (playerGoals [0] > playerGoals [1])
 				winningPlayer = 0;
 			else if (playerGoals [0] < playerGoals [1])
@@ -63,7 +66,10 @@ public class GameController : MonoBehaviour
 
 			gameState = GameState.goalScord;
 			goalTimer = 0.0f;
-			onScored ();
+
+
+			if(onScored != null)
+				onScored ();
 
 			if(playerGoals [playerGoal] > 9)
 			{
@@ -72,36 +78,28 @@ public class GameController : MonoBehaviour
 		}
 	}
 
-	bool restarting = false;
 	void Update()
 	{
-		if (gameState == GameState.goalScord) {
+		if (gameState == GameState.goalScord)
+		{
 			goalTimer += Time.deltaTime;
 
-			if (goalTimer > resetPause && !reseting) {
-					reseting = true;
-					onReset ();
-			}
-
-			if (goalTimer > goalPause) {
-					goalTimer = 0.0f;
-					reseting = false;
-					onKickOff ();
-			}
-		} else if (gameState == GameState.finished) {
-			restartTimer += Time.deltaTime;
-
-
-			if(restartTimer > gameRestartPause && !restarting)
+			if(goalTimer > resetPause && !reseting)
 			{
-				onReset ();
-				onFinished();
+				reseting = true;
+				
+				if(onReset != null)
+					onReset();
 			}
-			
-			if(restarting && restartTimer > (gameRestartPause * 2.0f))
+
+			if(goalTimer > goalPause)
 			{
-				restarting = false;
 				gameState = GameState.inPlay;
+				goalTimer = 0.0f;
+				reseting = false;
+				
+				if(onKickOff != null)
+					onKickOff();
 			}
 		}
 	}

@@ -90,7 +90,6 @@ public class UdpTouchReceiver : MonoBehaviour
 				if(touch.newTouch == true)
 				{
 					pitch.AddTectonics( touch.position );
-					print (touch.position);
 								
 					touch.newTouch = false;	
 				}
@@ -117,8 +116,6 @@ public class UdpTouchReceiver : MonoBehaviour
 	const int packetLength = 9;
 	void OnReceive(IAsyncResult result)
 	{
-		print ("start");
-	
 		bool newTouchRecieved = false;
 	
 	//	lock(client)
@@ -157,9 +154,7 @@ public class UdpTouchReceiver : MonoBehaviour
 			}
 
 			recieving = false;
-			
-			print ("end");		    																					
-		    																							    																							    																					
+																										    																							    																					
 			BeginRecieve();	
 		}			
 	}

@@ -11,6 +11,9 @@ public class PlaySoundOnImpact : MonoBehaviour
 
 	public void OnCollisionEnter()
 	{
+		if(audio.isPlaying)
+			return;
+	
 		audio.volume = Random.Range(minVolume, maxVolume);
 		audio.pitch = Random.Range(minPitch, maxPitch);
 		

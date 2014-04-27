@@ -26,6 +26,8 @@ public class PitchTectonics : MonoBehaviour {
 	public float minVolume = 0.8f;
 	public float maxVolume = 1f;
 
+	public AnimationCurve shake;
+
 	public static PitchTectonics instance
 	{
 		get;
@@ -206,6 +208,8 @@ public class PitchTectonics : MonoBehaviour {
 
 	public void AddTectonics(Vector2 uvCoords)
 	{
+		CameraShake.Shake( shake );
+	
 		pixelInput.x = (int)(tectonicInputMap.width * uvCoords.x);
 		pixelInput.y = (int)(tectonicInputMap.height * uvCoords.y);
 		if (pixelInput.x < 0) { pixelInput.x = 0; }

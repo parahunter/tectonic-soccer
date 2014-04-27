@@ -12,16 +12,11 @@ public class ScoreCounter : MonoBehaviour {
 			renderer.material.mainTexture = ((ScoreBoardScript)(transform.parent.gameObject.GetComponent ("ScoreBoardScript"))).goalTextures[GameController.instance.playerGoals[team]];
 		}
 	}
-
-	void onFinish()
-	{
-		renderer.material.mainTexture = ((ScoreBoardScript)(transform.parent.gameObject.GetComponent ("ScoreBoardScript"))).goalTextures[0];
-	}
-
+	
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		GameController.instance.onScored += onGoal;
-		GameController.instance.onFinished += onFinish;
 	}
 	
 	// Update is called once per frame
