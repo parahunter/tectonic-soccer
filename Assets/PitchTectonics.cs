@@ -21,6 +21,11 @@ public class PitchTectonics : MonoBehaviour {
 	public float brushPower = 0.3f;
 	public float tectonicPower = 5.0f;
 
+	public float minPitch = 0.8f;
+	public float maxPitch = 1.2f;
+	public float minVolume = 0.8f;
+	public float maxVolume = 1f;
+
 	public static PitchTectonics instance
 	{
 		get;
@@ -247,6 +252,12 @@ public class PitchTectonics : MonoBehaviour {
 			tectonicInputMap.SetPixels (rectPos.x, rectPos.y, rectPos.width, rectPos.height, inputColor);
 			tectonicInputMap.Apply();
 		}
+		
+		audio.volume = Random.Range(minVolume, maxVolume);
+		audio.pitch = Random.Range(minPitch, maxPitch);
+		audio.Play();
+		
+		
 	}
 
 	void SetPitchHeight()

@@ -40,10 +40,23 @@ public class UdpTouchReceiver : MonoBehaviour
 	
 	void Start()
 	{
-		udpRemoteIpEndPoint = new IPEndPoint( IPAddress.Any, port );	
+		try
+		{
+			udpRemoteIpEndPoint = new IPEndPoint( IPAddress.Any, port );	
+					
+			client = new UdpClient(udpRemoteIpEndPoint);
+			
+			//client.Client.ExclusiveAddressUse = false;
+			//client.Client.ReceiveTimeout = 1000;
+		}
+		catch( SocketException e)
+		{
+			print (e);
+			
+			if(client != null)
+				client.Close();
+		}
 		
-		client = new UdpClient(udpRemoteIpEndPoint);
-
 		BeginRecieve();
 	}
 	
@@ -60,16 +73,25 @@ public class UdpTouchReceiver : MonoBehaviour
 		}
 	}
 	
+	bool recieving = false;
+	
 	void Update()
 	{
-		if(touches != null)
+		if(touches == null)
+			return;
+		
+		if(recieving)
+			return;
+			
 		{
-			foreach(TouchData touch in GetTouches())
+			foreach(TouchData touch in touches)
 			{
 				if(touch.newTouch == true)
 				{
 					pitch.AddTectonics( touch.position );
-					print (touch.position);	
+					print (touch.position);
+					
+					touch.newTouch = false;	
 				}
 			}
 		}
@@ -77,49 +99,68 @@ public class UdpTouchReceiver : MonoBehaviour
 		
  	void BeginRecieve()
 	{
-		UdpState state = new UdpState();
-		state.endPoint = udpRemoteIpEndPoint;
-		state.client = client;
+	//	lock(client)
+		{
+			UdpState state = new UdpState();
+			state.endPoint = udpRemoteIpEndPoint;
+			state.client = client;
 		
-		client.BeginReceive(new AsyncCallback(OnReceive), state);
+			client.BeginReceive(new AsyncCallback(OnReceive), state);
+		}
 	}
 	
 	const int packetLength = 9;
 	void OnReceive(IAsyncResult result)
 	{
-		UdpState state = (UdpState) result.AsyncState;
-		UdpClient c = state.client;
-		IPEndPoint e = state.endPoint;
+		recieving = true;
 		
-		Byte[] data = c.EndReceive( result, ref e);
-		
-		TouchData[] newTouchData = new TouchData[ data.Length / packetLength];
-			
-		for(int i = 0 ; i < newTouchData.Length ; i++)
+	//	lock(client)
 		{
-			float x = 1 - EndianBitConverter.Big.ToSingle( data, i * packetLength);
-			float y = EndianBitConverter.Big.ToSingle( data, i * packetLength + 4);
-			
-			TouchData touchData = new TouchData();
-			touchData.position = new Vector2(x, y);
-			touchData.newTouch = data[i * packetLength + 8] == 1 ? true : false;
-			
-			if(touchData.newTouch)
+			UdpState state = (UdpState) result.AsyncState;
+			UdpClient c = state.client;
+			IPEndPoint e = state.endPoint;
+		
+			Byte[] data = c.EndReceive( result, ref e);
+		
+			TouchData[] newTouchData = new TouchData[ data.Length / packetLength];
+				
+			for(int i = 0 ; i < newTouchData.Length ; i++)
 			{
-			//	pitch.AddTectonics( touchData.position );
-				print ("boom");
+				float x = 1 - EndianBitConverter.Big.ToSingle( data, i * packetLength);
+				float y = EndianBitConverter.Big.ToSingle( data, i * packetLength + 4);
+				
+				TouchData touchData = new TouchData();
+				touchData.position = new Vector2(x, y);
+				touchData.newTouch = data[i * packetLength + 8] == 1 ? true : false;
+				
+				if(touchData.newTouch)
+				{ 
+				//	pitch.AddTectonics( touchData.position );
+					print ("boom");
+				}
+				
+				newTouchData[i] = touchData;
 			}
 			
-			newTouchData[i] = touchData;
-		}
-		
-		touches = newTouchData;
-						
-		BeginRecieve();				
+//			lock(touches)
+			{
+				touches = newTouchData;
+			}
+									
+			BeginRecieve();	
+			
+			recieving = false;
+		}			
 	}
 	
 	void OnDestroy()
 	{
-		client.Close();
+		if(client != null)
+		{	
+			lock(client)
+			{
+				client.Close();
+			}
+		}	
 	}
 }

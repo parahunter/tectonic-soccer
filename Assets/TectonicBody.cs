@@ -11,6 +11,11 @@ public class TectonicBody : MonoBehaviour
 	
 	public float bounceForce = 99f;
 	
+	public float minPitch = 0.8f;
+	public float maxPitch = 1.2f;
+	public float minVolume = 0.8f;
+	public float maxVolume = 1f;
+		
 	void Start()
 	{
 		pitch = PitchTectonics.instance;

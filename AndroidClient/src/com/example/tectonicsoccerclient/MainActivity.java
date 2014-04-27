@@ -22,7 +22,7 @@ public class MainActivity extends Activity
 	UdpSender udpSender;
 	
 	String hostname = "192.168.0.30";
-	int udpServerPort = 40000;
+	int udpServerPort = 40005;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) 
