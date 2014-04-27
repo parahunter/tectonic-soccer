@@ -64,20 +64,14 @@ public class PitchTectonics : MonoBehaviour {
 		for (int l = 0; l < lengthVerts; ++l) {
 			for (int w = 0; w < widthVerts; ++w) {
 				index = (w * lengthVerts) + l;
-				if(index >= (widthVerts * lengthVerts))
-				{
-					Debug.Log(l);
-					Debug.Log(w);
-				}
+
 				verts[index].x = ((l * incrementL) - halfLength);
-				//verts[index].y = 0.0f; 
 				verts[index].z = ((w * incrementW) - halfWidth);
-				
-				//normals[index].x = 0.0f; 
+
 				normals[index].y = 1.0f; 
-				//normals[index].x = 0.0f;
 				
-				uv[index].x = (l * incrementU); uv[index].y = (w * incrementV);
+				uv[index].x = (l * incrementU);
+				uv[index].y = (w * incrementV);
 			}
 		}
 		pitchSurface.vertices = verts;
@@ -85,28 +79,25 @@ public class PitchTectonics : MonoBehaviour {
 		pitchSurface.uv = uv;
 		
 		int[] indices = new int[(widthVerts - 1) * (lengthVerts - 1) * 6];
-		
 
-		int i = 0;
+		int i = -1;
 		int index1, index2, index3;
-		for (int x = 0; x < lengthVerts -1; ++x) {
-			for (int y = 0; y < widthVerts -1; ++y) {
+		int stopAtX = lengthVerts - 1;
+		int stopAtY = widthVerts - 1;
+		for (int x = 0; x < stopAtX; ++x) {
+			for (int y = 0; y < stopAtY; ++y) {
 				index1 = ((y * lengthVerts) + x);
 				index2 = index1 + lengthVerts;
 				index3 = index2 + 1;
-				indices[i + 0] = index1;
-				indices[i + 1] = index2;
-				indices[i + 2] = index3;
-				indices[i + 3] = index1;
-				indices[i + 4] = index3;
-				indices[i + 5] = index1 + 1;
-				
-				i += 6;
+				indices[++i] = index1;
+				indices[++i] = index2;
+				indices[++i] = index3;
+				indices[++i] = index1;
+				indices[++i] = index3;
+				indices[++i] = index1 + 1;
 			}
 		}
-		
-		Debug.Log (indices.Length);
-		
+
 		pitchSurface.triangles = indices;
 	}
 	
@@ -132,6 +123,7 @@ public class PitchTectonics : MonoBehaviour {
 	void Start () 
 	{
 		pitchSurface = new Mesh ();
+		pitchSurface.MarkDynamic ();
 		InitialisePitch ();
 		
 		MeshCollider meshCollider = this.GetComponent ("MeshCollider") as MeshCollider;
@@ -221,6 +213,11 @@ public class PitchTectonics : MonoBehaviour {
 		}
 
 		pitchSurface.vertices = verts;
+
+		
+		MeshCollider meshCollider = this.GetComponent ("MeshCollider") as MeshCollider;
+		meshCollider.sharedMesh = null;
+		meshCollider.sharedMesh = pitchSurface;
 	}
 
 	public float dampening = 80f;
