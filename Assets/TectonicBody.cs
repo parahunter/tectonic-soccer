@@ -16,6 +16,8 @@ public class TectonicBody : MonoBehaviour
 		pitch = PitchTectonics.instance;
 	}
 	
+	bool triggeredSound = false;
+	
 	void FixedUpdate()
 	{
 		Vector3 position = transform.position + Vector3.down * offsetY;	
@@ -23,6 +25,13 @@ public class TectonicBody : MonoBehaviour
 		Vector2 pos2D = new Vector2( position.x, position.z );
 		
 		float pitchHeight = pitch.GetHeight(pos2D);
+		
+		if(pitchHeight > position.y && !triggeredSound && audio != null)
+			audio.Play();
+		
+		else if(pitchHeight < position.y)
+			triggeredSound = false;
+		
 		if(pitchHeight > position.y && !Mathf.Approximately(pitchHeight, 0))
 		{
 			Vector3 normal = pitch.GetNormal(pos2D);
