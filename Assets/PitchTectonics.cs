@@ -12,13 +12,20 @@ public class PitchTectonics : MonoBehaviour {
 	public float length = 100.0f;
 	private float width = 50.0f;
 	public float aspectRatio = 0.5f;
-	private int widthVerts = 3;
+	public int widthVerts = 3;
 	public int lengthVerts = 6;
-	Mesh pitchSurface;
+	public Mesh pitchSurface;
 
 	public bool testing = false;
 	public bool debugging = false;
+	public float brushPower = 0.3f;
 	public float tectonicPower = 5.0f;
+
+	public static PitchTectonics instance
+	{
+		get;
+		private set;
+	}
 
 	private float uPerPixel = 0.0f;
 	private float vPerPixel = 0.0f;
@@ -44,20 +51,51 @@ public class PitchTectonics : MonoBehaviour {
 	private Color[] inputColor;
 	private Color[] decalColor;
 	
-	Vector3[] verts;
-	Vector2[] uv;
+	public Vector3[] verts;
+	public Vector3[] normals;
+	public Vector2[] uv;
 	
+	public float GetHeight(Vector2 position)
+	{
+		position.x /= halfLength;
+		position.y /= halfWidth;
+	
+		int x = (int) ( (position.x + 1) * 0.5f * (lengthVerts - 1) );
+		int y = (int) ( (position.y + 1) * 0.5f * (widthVerts - 1) );
+
+		x = Mathf.Clamp(x , 0, lengthVerts - 1);
+		y = Mathf.Clamp(y, 0, widthVerts - 1);
+				
+		return verts[ x + y * lengthVerts].y;	
+	}
+	
+	public Vector3 GetNormal(Vector2 position)
+	{
+		position.x /= halfLength;
+		position.y /= halfWidth;
+		
+		int x = (int) ( (position.x + 1) * 0.5f * (lengthVerts - 1) );
+		int y = (int) ( (position.y + 1) * 0.5f * (widthVerts - 1) );
+
+		x = Mathf.Clamp(x, 0, lengthVerts - 1);
+		y = Mathf.Clamp(y, 0, widthVerts - 1);		
+						
+		return normals[ x + y * lengthVerts];	
+	}
+	
+	float halfLength;
+	float halfWidth;
 	private void InitialiseVerts()
 	{
 		float incrementL = length / (lengthVerts - 1);
 		float incrementW = width / (widthVerts - 1);
 		float incrementU = 1.0f / (lengthVerts - 1);
 		float incrementV = 1.0f / (widthVerts - 1);
-		float halfLength = length * 0.5f;
-		float halfWidth = halfLength * aspectRatio;
+		halfLength = length * 0.5f;
+		halfWidth = halfLength * aspectRatio;
 		
 		verts = new Vector3[widthVerts * lengthVerts];
-		Vector3[] normals = new Vector3[widthVerts * lengthVerts];
+		normals = new Vector3[widthVerts * lengthVerts];
 		uv = new Vector2[widthVerts * lengthVerts];
 		
 		int index = 0;
@@ -128,10 +166,17 @@ public class PitchTectonics : MonoBehaviour {
 		InitialiseVerts ();
 	}
 
+	void Awake()
+	{
+		instance = this;
+	}
+
 	// Use this for initialization
 	void Start () 
 	{
 		pitchSurface = new Mesh ();
+		pitchSurface.MarkDynamic();
+		
 		InitialisePitch ();
 		
 		MeshCollider meshCollider = this.GetComponent ("MeshCollider") as MeshCollider;
@@ -195,7 +240,7 @@ public class PitchTectonics : MonoBehaviour {
 		else {
 			for(int i = 0;i < decalColor.Length; ++i)
 			{
-				inputColor[i].r += decalColor[i].r; // Mathf.Max(inputColor[i].r, decalColor[i].r);
+				inputColor[i].r += decalColor[i].r * brushPower; // Mathf.Max(inputColor[i].r, decalColor[i].r);
 				inputColor[i].g = inputColor[i].r;
 				inputColor[i].b = inputColor[i].r;
 			}
@@ -221,6 +266,8 @@ public class PitchTectonics : MonoBehaviour {
 		}
 
 		pitchSurface.vertices = verts;
+		pitchSurface.RecalculateNormals();
+		normals = pitchSurface.normals;		
 	}
 
 	public float dampening = 80f;
