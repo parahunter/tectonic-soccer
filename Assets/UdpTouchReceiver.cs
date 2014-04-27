@@ -74,6 +74,7 @@ public class UdpTouchReceiver : MonoBehaviour
 	}
 	
 	bool recieving = false;
+	bool reading = false;
 	
 	void Update()
 	{
@@ -84,6 +85,7 @@ public class UdpTouchReceiver : MonoBehaviour
 			return;
 			
 		{
+			reading = true;
 			foreach(TouchData touch in touches)
 			{
 				if(touch.newTouch == true)
@@ -94,6 +96,8 @@ public class UdpTouchReceiver : MonoBehaviour
 					touch.newTouch = false;	
 				}
 			}
+			
+			reading = false;
 		}
 	}
 		
@@ -112,7 +116,10 @@ public class UdpTouchReceiver : MonoBehaviour
 	const int packetLength = 9;
 	void OnReceive(IAsyncResult result)
 	{
-		recieving = true;
+		while(reading)
+		{
+			
+		}
 		
 	//	lock(client)
 		{
@@ -142,6 +149,7 @@ public class UdpTouchReceiver : MonoBehaviour
 				newTouchData[i] = touchData;
 			}
 			
+			recieving = true;
 //			lock(touches)
 			{
 				touches = newTouchData;

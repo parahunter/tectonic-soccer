@@ -20,7 +20,7 @@ public class UdpSender implements Runnable {
 	
 	private Touch[] touches;
 	
-	private int milisecondsPerPackage = 1000/10;
+	private int milisecondsPerPackage = 1000/60;
 	
 	private boolean[] newTouches = new boolean[4];
 	
