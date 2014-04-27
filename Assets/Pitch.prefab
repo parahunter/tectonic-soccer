@@ -87,12 +87,18 @@ MonoBehaviour:
   tectonicDecalMap: {fileID: 2800000, guid: 808c162b05796344080b3e9aee1c319c, type: 3}
   levelOfDetail: 1
   length: 20
-  aspectRatio: .5
+  aspectRatio: .649999976
+  widthVerts: 3
   lengthVerts: 128
+  pitchSurface: {fileID: 0}
   testing: 1
   debugging: 0
-  tectonicPower: 2
-  dampening: .75
+  brushPower: .300000012
+  tectonicPower: 5
+  verts: []
+  normals: []
+  uv: []
+  dampening: .5
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

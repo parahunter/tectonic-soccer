@@ -264,9 +264,10 @@ public class PitchTectonics : MonoBehaviour {
 			int y = (int) ( uvssss.y * w ) ; 
 			verts[i].y = tectonicPower * pixels[x + y * lengthVerts].r ;// * tectonicPowerMap.GetPixelBilinear(uv[i].x, uv[i].y).r;
 		}
-
+		
 		pitchSurface.vertices = verts;
 		pitchSurface.RecalculateNormals();
+		pitchSurface.RecalculateBounds();
 		normals = pitchSurface.normals;		
 	}
 

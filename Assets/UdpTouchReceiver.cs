@@ -117,4 +117,9 @@ public class UdpTouchReceiver : MonoBehaviour
 						
 		BeginRecieve();				
 	}
+	
+	void OnDestroy()
+	{
+		client.Close();
+	}
 }
