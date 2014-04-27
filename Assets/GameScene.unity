@@ -104,6 +104,8 @@ MonoBehaviour:
   playerGoals: 
   lastScorer: -1
   winningPlayer: -1
+  resetPause: 3
+  kickOffDelay: 2
 --- !u!4 &75373637
 Transform:
   m_ObjectHideFlags: 0
