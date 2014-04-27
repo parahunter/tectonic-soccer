@@ -19,9 +19,9 @@ public class ResetScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		position = new Vector3 (transform.position.x, transform.position.y, transform.position.z);
-		velocity = new Vector3 (rigidbody.velocity.x, rigidbody.velocity.y, rigidbody.velocity.z);
-		rotation = new Quaternion (transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
+		position = transform.position;
+		velocity = rigidbody.velocity; 
+		rotation = transform.rotation;
 		
 		GameController.instance.onReset += Reset;
 	}
