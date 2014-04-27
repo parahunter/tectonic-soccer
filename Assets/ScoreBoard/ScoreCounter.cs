@@ -4,13 +4,13 @@ using System.Collections;
 public class ScoreCounter : MonoBehaviour {
 
 	public int team = 0;
-	private ScoreCounter;
+	private int ScoreCounter;
 
 	void onGoal()
 	{
 		if(GameController.instance.lastScorer == team)
 		{
-			renderer.material.mainTexture = tectonicInputMap;
+			renderer.material.mainTexture = transform;
 		}
 	}
 
